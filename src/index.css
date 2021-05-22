@@ -1,13 +1,87 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
+}
+
+.outer-container {
+    display: flex;
+    height: 100vh;
+}
+
+.flex {
+    display: flex;
+    margin: auto;
+}
+
+.flex-column {
+    flex-direction: column;
+    align-items: center;
+}
+
+.flex-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.flex#calculator {
+    width: 400px;
+}
+
+.display {
+    width: 100%;
+    background-color: #ccc;
+}
+
+.display p {
+    margin: 1em;
+    text-align: right;
+}
+
+.grid {
+    display: grid;
+    width: 100%;
+}
+
+.grid-row-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    grid-auto-rows: minmax(40px, auto);
+}
+
+.grid-row-4 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    grid-auto-rows: minmax(40px, auto);
+}
+
+.grid#digits {
+    grid-column-end: span 3;
+    grid-row-end: span 4;
+}
+
+.button {
+    display: flex;
+    background-color: #aaa;
+}
+
+.button p {
+    margin: auto;
+    user-select: none;
+}
+
+.button#zero {
+    grid-column-end: span 2;
 }
