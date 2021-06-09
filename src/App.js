@@ -1,6 +1,7 @@
 import React from 'react'
 import { Display } from './Display'
 import { Buttons } from './Buttons'
+import { FormulaDisplay } from './FormulaDisplay'
 
 function App() {
   return (
@@ -8,7 +9,11 @@ function App() {
       <header className="App-header">
       </header>
       <div className='outer-container'>
-        <div id='calculator' className='flex flex-column'>
+        <div className='calculator'>
+          <div className='description'>
+            <p>Formula Calculator</p>
+          </div>
+          <FormulaDisplay />
           <Display />
           <Buttons />
         </div>
