@@ -115,13 +115,6 @@ body {
   border: 1px solid #999;
 }
 
-.button:hover {
-  /* background-color: #eee; */
-  background-color: #333;
-  color: #eee;
-  border: none;
-}
-
 .button p {
   margin: auto;
   font-weight: bold;
@@ -135,10 +128,28 @@ body {
   grid-column-end: span 2;
 }
 
-.button#ac:hover {
+.button#equals {
+  grid-row-end: span 2;
+}
+
+.button:active {
+  background-color: #333;
+  color: #eee;
+  border: none;
+}
+
+.button#ac:active {
   background-color: red;
 }
 
-.button#equals {
-  grid-row-end: span 2;
+@media (hover: hover) and (pointer: fine) {
+  .button:hover {
+    background-color: #333;
+    color: #eee;
+    border: none;
+  }
+
+  .button#ac:hover {
+    background-color: red;
+  }
 }
