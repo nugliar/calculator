@@ -16,6 +16,17 @@ const PRECISION = 15
 const ERROR_SYNTAX = 'SYNTAX ERROR'
 const ERROR_DIVISION_BY_ZERO = 'DIVISION BY ZERO'
 
+// Exponentiation routine for bigint
+const bigintPow = (bigint, expo) => {
+  let result = BigInt(1)
+
+  for (let i = 0; i < expo; i++) {
+    result *= bigint
+  }
+  return result
+}
+
+// Create new operand
 const newOperand = () => {
   return {
     type: OPERAND,
@@ -26,6 +37,7 @@ const newOperand = () => {
   }
 }
 
+// Create new operator
 const newOperator = () => {
   return {
     type: OPERATOR,
@@ -84,18 +96,18 @@ const calculatePrimitive = (operand2, operator, operand1) => {
         throw(new Error(ERROR_DIVISION_BY_ZERO))
       }
       expo = -PRECISION
-      coeff = (c1 * 10n ** BigInt(-expo)) / c2
+      coeff = (c1 * bigintPow(10n, -expo)) / c2
       expo += e1 - e2
       break
     case PLUS:
       expo = Math.min(e1, e2);
-      coeff = c1 * 10n ** BigInt(-expo + e1) +
-        c2 * 10n ** BigInt(-expo + e2)
+      coeff = c1 * bigintPow(10n, -expo + e1) +
+        c2 * bigintPow(10n, -expo + e2)
       break
     case MINUS:
       expo = Math.min(e1, e2)
-      coeff = c1 * 10n ** BigInt(-expo + e1) -
-        c2 * 10n ** BigInt(-expo + e2)
+      coeff = c1 * bigintPow(10n, -expo + e1) -
+        c2 * bigintPow(10n, -expo + e2)
       break
     default:
       break
@@ -201,7 +213,7 @@ const logicSlice = createSlice({
       }
 
       // Add digit only if operand coefficient is within precision limits
-      if (operand.coefficient <= 10n ** BigInt(PRECISION) - 1n) {
+      if (operand.coefficient <= bigintPow(10n, PRECISION) - 1n) {
         operand.coefficient = 10n * operand.coefficient + BigInt(digit)
         operand.exponent -= operand.isRational ? 1 : 0
         operand.isNegative = state.isNegative
