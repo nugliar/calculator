@@ -11,7 +11,8 @@ const MULTIPLY = 'x'
 const DIVIDE = '/'
 const EQUAL = '='
 
-const PRECISION = 15
+// Negative sign for PRECISION will not have any effect
+const PRECISION = 20
 
 const ERROR_SYNTAX = 'SYNTAX ERROR'
 const ERROR_DIVISION_BY_ZERO = 'DIVISION BY ZERO'
@@ -49,6 +50,41 @@ const newOperator = () => {
 // For NaN values a special big-integer operand is used.
 const NAN_OPERAND = {...newOperand(), coefficient: null}
 
+const operandSize = (operand) => {
+  if (!operand || operand.coefficient === null) {
+    return 'NaN'.length
+  }
+  return (operand.isRational ? 1 : 0) + Math.max(
+    operand.coefficient.toString().length,
+    Math.abs(operand.exponent)
+  )
+}
+
+const clampOperand = (operand) => {
+
+  // Remove trailing zeros
+
+  if (!operand || operand.coefficient === null) {
+    return NAN_OPERAND
+  }
+
+  let coeff = operand.coefficient
+  let expo = operand.exponent
+
+  while (expo < 0 && coeff % 10n === 0n) {
+    coeff /= 10n
+    expo++
+  }
+
+  return {
+    ...newOperand(),
+    coefficient: coeff,
+    exponent: expo,
+    isRational: expo !== 0,
+    isNegative: operand.isNegative
+  }
+}
+
 const calculatePrimitive = (operand2, operator, operand1) => {
 
   // Evaluate primitive expression
@@ -74,14 +110,10 @@ const calculatePrimitive = (operand2, operator, operand1) => {
     return NAN_OPERAND
   }
 
-  const sign1 = operand1.isNegative ? -1 : 1
-  const sign2 = operand2.isNegative ? -1 : 1
-  const c1 = operand1.coefficient * BigInt(sign1)
-  const c2 = operand2.coefficient * BigInt(sign2)
+  const c1 = operand1.coefficient * BigInt(operand1.isNegative ? -1 : 1)
+  const c2 = operand2.coefficient * BigInt(operand2.isNegative ? -1 : 1)
   const e2 = operand2.exponent
   const e1 = operand1.exponent
-
-  const result = newOperand()
 
   let coeff = 0n
   let expo = 0
@@ -95,7 +127,7 @@ const calculatePrimitive = (operand2, operator, operand1) => {
       if (c2 === BigInt(0)) {
         throw(new Error(ERROR_DIVISION_BY_ZERO))
       }
-      expo = -PRECISION
+      expo = -Math.abs(PRECISION)
       coeff = (c1 * bigintPow(10n, -expo)) / c2
       expo += e1 - e2
       break
@@ -113,41 +145,69 @@ const calculatePrimitive = (operand2, operator, operand1) => {
       break
   }
 
-  // Clamp trailing zeroes
-  while (expo < 0 && coeff % 10n === 0n) {
-    coeff /= 10n
-    expo++
-  }
-  result.coefficient = coeff > 0n ? coeff : -coeff
-  result.exponent = expo
-  result.isNegative = coeff < 0n
-  result.isRational = expo < 0
-
-  return result
+  return clampOperand({
+    ...newOperand(),
+    coefficient: coeff > 0n ? coeff : -coeff,
+    exponent: expo,
+    isNegative: coeff < 0n,
+    isRational: expo < 0
+  })
 }
 
 const displayOperand = (operand) => {
 
+  const sizeLimit = Math.abs(PRECISION)
+
   if (!operand || operand.coefficient === null) {
     return ('NaN')
   }
-
-  const sign = operand.isNegative ? -1 : 1
-  const coeff = operand.coefficient * BigInt(sign)
+  const sign = operand.isNegative ? '-' : ''
+  const coeff = operand.coefficient
   const expo = operand.exponent
-  let display = coeff.toString()
+  const sizeOperand = operandSize(operand)
 
-  // Handle floats that equal to zero (i.e 0.00000)
-  if (display.length <= -expo) {
-    display = '0'.repeat(-expo - display.length + 1).concat(display)
-  }
-  if (expo || operand.isRational) {
-    return display
-      .slice(0, display.length - -expo)
-      .concat(`.${display
-      .slice(display.length - -expo)}`)
+  let coeffDisplay = coeff.toString()
+  let display = ''
+
+  // If exponent too large, use exponential form.
+  if (sizeOperand > sizeLimit) {
+    const sizeExpo = coeffDisplay.length - 1 + expo
+    const expoDisplay = sizeExpo ? `e${expo >= 0 ? '+' : ''}${sizeExpo}` : ''
+
+    if (coeff === BigInt(0)) {
+      return sign + '0'
+    }
+    if (coeffDisplay.length > 1) {
+      coeffDisplay = coeffDisplay
+        .slice(0, 1)
+        .concat(`.${coeffDisplay.slice(1, sizeLimit - expoDisplay.length - 1)}`)
+      // Remove trailing zeros
+      coeffDisplay = coeffDisplay.replace(
+        coeffDisplay.match(/\.?0+$/),
+        ''
+      )
+    }
+    display = coeffDisplay + expoDisplay
+    return display.length <= sizeLimit ? sign + display : sign + 'inf'
+
   } else {
-    return display
+    if (operand.isRational) {
+      // Prepend zeros according to exponent value.
+      if (coeffDisplay.length <= Math.abs(expo)) {
+        coeffDisplay = '0'
+          .repeat(Math.abs(expo) - coeffDisplay.length + 1)
+          .concat(coeffDisplay)
+      }
+      // Display operand as fixed point number (insert dot).
+      coeffDisplay = coeffDisplay
+        .slice(0, coeffDisplay.length - Math.abs(expo))
+        .concat(`.${coeffDisplay.slice(coeffDisplay.length - Math.abs(expo))}`)
+
+    } else {
+      // Append zeros accroding to exponent value.
+      coeffDisplay = coeffDisplay.concat('0'.repeat(expo))
+    }
+    return sign + coeffDisplay
   }
 }
 
@@ -212,8 +272,11 @@ const logicSlice = createSlice({
         operand = bigIntExpression.pop()
       }
 
-      // Add digit only if operand coefficient is within precision limits
-      if (operand.coefficient <= bigintPow(10n, PRECISION) - 1n) {
+      const sizeLimit = Math.abs(PRECISION)
+      const sizeOperand = operandSize(operand)
+
+      // Add digit only if operand size is within precision limits
+      if (sizeOperand < sizeLimit) {
         operand.coefficient = 10n * operand.coefficient + BigInt(digit)
         operand.exponent -= operand.isRational ? 1 : 0
         operand.isNegative = state.isNegative
@@ -240,7 +303,12 @@ const logicSlice = createSlice({
         operand = bigIntExpression.pop()
       }
       if (!operand.isRational) {
-        operand.isRational = true
+        const sizeLimit = Math.abs(PRECISION)
+        const sizeOperand = operandSize(operand)
+
+        if (sizeOperand < sizeLimit) {
+          operand.isRational = true
+        }
       }
       bigIntExpression.push(operand)
       state.display = displayOperand(operand)
@@ -350,7 +418,9 @@ const logicSlice = createSlice({
         const item = postfixExpr.pop()
 
         if (item.type === OPERAND) {
-          operandStack.push(item)
+          operandStack.push(
+            clampOperand(item)
+          )
         } else {
           try {
             operandStack.push(
