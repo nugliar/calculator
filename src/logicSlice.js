@@ -172,7 +172,7 @@ const displayOperand = (operand) => {
   // If exponent too large, use exponential form.
   if (sizeOperand > sizeLimit) {
     const sizeExpo = coeffDisplay.length - 1 + expo
-    const expoDisplay = sizeExpo ? `e${expo >= 0 ? '+' : ''}${sizeExpo}` : ''
+    const expoDisplay = sizeExpo ? `e${sizeExpo < 0 ? '' : '+'}${sizeExpo}` : ''
 
     if (coeff === BigInt(0)) {
       return sign + '0'
