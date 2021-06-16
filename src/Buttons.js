@@ -11,8 +11,8 @@ export const Buttons = () => {
       <OperatorButton id='divide' label='/' />
       <OperatorButton id='multiply' label='x' />
       <DigitButtons />
-      <OperatorButton id='minus' label='-' />
-      <OperatorButton id='plus' label='+' />
+      <OperatorButton id='subtract' label='-' />
+      <OperatorButton id='add' label='+' />
       <EqualsButton />
     </div>
   )

@@ -124,7 +124,7 @@ body {
   grid-column-end: span 2;
 }
 
-.button#ac {
+.button#clear {
   grid-column-end: span 2;
 }
 
@@ -138,7 +138,7 @@ body {
   border: none;
 }
 
-.button#ac:active {
+.button#clear:active {
   background-color: red;
 }
 
@@ -149,7 +149,7 @@ body {
     border: none;
   }
 
-  .button#ac:hover {
+  .button#clear:hover {
     background-color: red;
   }
 }

@@ -9,7 +9,7 @@ export const FractionButton = () => {
   }
 
   return (
-    <div id='fraction' className='button button-digit' onClick={handleClick}>
+    <div id='decimal' className='button button-digit' onClick={handleClick}>
       <p>.</p>
     </div>
   )

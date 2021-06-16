@@ -9,7 +9,7 @@ export const AllClearButton = () => {
   }
 
   return (
-    <div id='ac' className='button button-oper' onClick={handleClick}>
+    <div id='clear' className='button button-oper' onClick={handleClick}>
       <p>AC</p>
     </div>
   )

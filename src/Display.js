@@ -6,7 +6,7 @@ export const Display = () => {
   const display = useSelector(selectDisplay)
 
   return (
-    <div className='display display-large'>
+    <div id='display' className='display display-large'>
       <p className='display-text'>{display}</p>
     </div>
   )

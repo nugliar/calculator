@@ -127,7 +127,7 @@ const calculatePrimitive = (operand2, operator, operand1) => {
       if (c2 === BigInt(0)) {
         throw(new Error(ERROR_DIVISION_BY_ZERO))
       }
-      expo = -Math.abs(PRECISION)
+      expo = -Math.abs(5 * PRECISION)
       coeff = (c1 * bigintPow(10n, -expo)) / c2
       expo += e1 - e2
       break
@@ -167,17 +167,22 @@ const displayOperand = (operand) => {
   const sizeOperand = operandSize(operand)
 
   let coeffDisplay = coeff.toString()
+  let expoDisplay = ''
   let display = ''
 
-  // If exponent too large, use exponential form.
-  if (sizeOperand > sizeLimit) {
+  console.log(coeff, coeffDisplay.length, expo);
+  // If number too large or too small use exponential form
+  if ((sizeOperand > sizeLimit && expo >= 0)
+  || (expo < 0 && Math.abs(coeffDisplay.length + expo) >= sizeLimit - 2)) {
+    // Use exponential form
     const sizeExpo = coeffDisplay.length - 1 + expo
-    const expoDisplay = sizeExpo ? `e${sizeExpo < 0 ? '' : '+'}${sizeExpo}` : ''
+    expoDisplay = sizeExpo ? `e${sizeExpo < 0 ? '' : '+'}${sizeExpo}` : ''
 
     if (coeff === BigInt(0)) {
       return sign + '0'
     }
     if (coeffDisplay.length > 1) {
+      // Insert decimal point
       coeffDisplay = coeffDisplay
         .slice(0, 1)
         .concat(`.${coeffDisplay.slice(1, sizeLimit - expoDisplay.length - 1)}`)
@@ -191,23 +196,23 @@ const displayOperand = (operand) => {
     return display.length <= sizeLimit ? sign + display : sign + 'inf'
 
   } else {
+    // Fit to precision
     if (operand.isRational) {
-      // Prepend zeros according to exponent value.
+      // Prepend zeros according to exponent value
       if (coeffDisplay.length <= Math.abs(expo)) {
         coeffDisplay = '0'
           .repeat(Math.abs(expo) - coeffDisplay.length + 1)
           .concat(coeffDisplay)
       }
-      // Display operand as fixed point number (insert dot).
       coeffDisplay = coeffDisplay
         .slice(0, coeffDisplay.length - Math.abs(expo))
         .concat(`.${coeffDisplay.slice(coeffDisplay.length - Math.abs(expo))}`)
 
     } else {
-      // Append zeros accroding to exponent value.
+      // Append zeros accroding to exponent value
       coeffDisplay = coeffDisplay.concat('0'.repeat(expo))
     }
-    return sign + coeffDisplay
+    return sign + coeffDisplay.slice(0, sizeLimit)
   }
 }
 
@@ -348,16 +353,16 @@ const logicSlice = createSlice({
 
     calculateExpression: (state, action) => {
 
-      // Convert expression to postfix form and calculate
+      // Convert expression to postfix form and calculate.
 
-      // If last item in expression is operator, then remove it
+      // If last item in expression is operator, remove it.
       if (bigIntExpression.length > 0) {
         const lastItem = bigIntExpression[bigIntExpression.length - 1]
         if (lastItem.type === OPERATOR) {
           bigIntExpression.pop()
         }
       }
-      // Stop if nothing to calculate
+      // Stop if nothing to calculate.
       if (bigIntExpression.length === 0) {
         Object.assign(state, initialState)
         return
@@ -365,7 +370,7 @@ const logicSlice = createSlice({
 
       state.displayFormula = displayFormula(bigIntExpression)
 
-      // Precedense of operators
+      // Precedense of operators.
       const order = {
         [MULTIPLY]: 2,
         [DIVIDE]: 2,
@@ -374,31 +379,41 @@ const logicSlice = createSlice({
         [EQUAL]: 1
       }
 
-      // Convert to postfix form (operator follows operands)
+      // Convert to postfix form (operator follows operands).
       let postfixExpr = []
       let operatorStack = []
       let prevOperator = undefined
 
+      // Initialize postfix stack with operand
+      // on top of bigint stack (if any).
       if (bigIntExpression[0].type === OPERAND) {
         postfixExpr.unshift(bigIntExpression.shift())
       }
+      // Initialize previous operator value
       prevOperator = bigIntExpression[0]
 
       while (bigIntExpression.length > 0) {
+        // Pop item from bigint stack
         const item = bigIntExpression.shift()
 
         if (item.type === OPERATOR) {
+          // Push item to operator stack
           operatorStack.unshift(item)
 
         } else if (item.type === OPERAND) {
-
+          // Get last operator from operator stack
           const operator = operatorStack[0]
 
           if (prevOperator) {
+            // If previous operator has lower precedense than current
+            // operator, pop previous operator from postfix stack and
+            // push it back to operator stack.
             if (order[prevOperator.symbol] < order[operator.symbol]) {
               operatorStack.unshift(postfixExpr.shift())
             }
           }
+          // Push operand to postfix stack, followed by all operators
+          // from the operator stack.
           postfixExpr.unshift(...operatorStack, item)
           prevOperator = operatorStack[0]
           operatorStack = []
