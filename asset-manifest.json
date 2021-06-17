@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/calculator/static/css/main.54373bc2.chunk.css",
-    "main.js": "/calculator/static/js/main.46c5f39c.chunk.js",
-    "main.js.map": "/calculator/static/js/main.46c5f39c.chunk.js.map",
+    "main.css": "/calculator/static/css/main.86bea608.chunk.css",
+    "main.js": "/calculator/static/js/main.8c535331.chunk.js",
+    "main.js.map": "/calculator/static/js/main.8c535331.chunk.js.map",
     "runtime-main.js": "/calculator/static/js/runtime-main.cca38f1c.js",
     "runtime-main.js.map": "/calculator/static/js/runtime-main.cca38f1c.js.map",
     "static/js/2.a161bbe6.chunk.js": "/calculator/static/js/2.a161bbe6.chunk.js",
     "static/js/2.a161bbe6.chunk.js.map": "/calculator/static/js/2.a161bbe6.chunk.js.map",
     "index.html": "/calculator/index.html",
-    "static/css/main.54373bc2.chunk.css.map": "/calculator/static/css/main.54373bc2.chunk.css.map",
+    "static/css/main.86bea608.chunk.css.map": "/calculator/static/css/main.86bea608.chunk.css.map",
     "static/js/2.a161bbe6.chunk.js.LICENSE.txt": "/calculator/static/js/2.a161bbe6.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.cca38f1c.js",
     "static/js/2.a161bbe6.chunk.js",
-    "static/css/main.54373bc2.chunk.css",
-    "static/js/main.46c5f39c.chunk.js"
+    "static/css/main.86bea608.chunk.css",
+    "static/js/main.8c535331.chunk.js"
   ]
 }
