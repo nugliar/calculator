@@ -33,13 +33,17 @@ body {
   width: 100%;
 }
 
-.description p {
+.description a {
+  text-decoration: none;
+}
+
+.description a span {
   color: #111;
   font-size: 0.4em;
   font-weight: bold;
   text-align: right;
   text-transform: uppercase;
-  margin: 1em;
+  margin: 2em;
 }
 
 .description a {

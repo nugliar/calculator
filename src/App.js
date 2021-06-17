@@ -14,8 +14,8 @@ function App() {
           <div className='description'>
             <a className='link' href='https://github.com/nugliar/calculator'>
               <img src={githubIcon} alt='git' />
+              <span>Javascript Calculator</span>
             </a>
-            <p>Formula Calculator</p>
           </div>
           <FormulaDisplay />
           <Display />
